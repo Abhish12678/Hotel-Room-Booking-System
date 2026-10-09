@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Mumbai Diaries</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            color: #263b55;
+            background-color: white;
+        }
+
+        header {
+            background-color: #245582;
+            color: white;
+            padding: 18px;
+            text-align: center;
+        }
+
+        nav {
+            background-color: #eaf3fc;
+            padding: 15px;
+            text-align: center;
+        }
+
+        nav a {
+            color: #245582;
+            text-decoration: none;
+            margin: 10px;
+            font-weight: bold;
+        }
+
+        section {
+            padding: 30px 7%;
+            text-align: center;
+        }
+
+        h2 {
+            color: #245582;
+        }
+
+        .hero {
+            background-color: #dcecfb;
+            padding: 50px 15px;
+        }
+
+        .hero img {
+            width: 90%;
+            max-width: 750px;
+            height: 260px;
+            object-fit: cover;
+        }
+
+        .button {
+            background-color: #357fbd;
+            color: white;
+            padding: 10px 18px;
+            border: none;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 10px;
+            cursor: pointer;
+        }
+
+        .cards {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 18px;
+        }
+
+        .card {
+            border: 1px solid #cbdced;
+            padding: 12px;
+            width: 220px;
+            background-color: white;
+        }
+
+        .card img {
+            width: 100%;
+            height: 145px;
+            object-fit: cover;
+        }
+
+        .blue-section {
+            background-color: #edf5fc;
+        }
+
+        .stats {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 45px;
+        }
+
+        input, select {
+            padding: 10px;
+            margin: 7px;
+            width: 220px;
+            max-width: 90%;
+        }
+
+        footer {
+            background-color: #245582;
+            color: white;
+            text-align: center;
+            padding: 22px;
+        }
+
+        footer a {
+            color: white;
+        }
+
+        @media (max-width: 600px) {
+            nav a {
+                display: inline-block;
+                margin: 7px;
+            }
+
+            .hero img {
+                height: 180px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- Header -->
+<header id="home">
+    <h1>The Mumbai Diaries</h1>
+    <p>A Comfortable Stay in Mumbai</p>
+</header>
+
+<!-- Navigation -->
+<nav>
+    <a href="#home">Home</a>
+    <a href="#about">About</a>
+    <a href="#rooms">Rooms</a>
+    <a href="#services">Services</a>
+    <a href="#booking">Booking</a>
+    <a href="#reviews">Reviews</a>
+    <a href="#contact">Contact</a>
+</nav>
+
+<!-- Home -->
+<section class="hero">
+    <h2>Welcome to The Mumbai Diaries</h2>
+    <p>Comfortable rooms and friendly service for your stay.</p>
+
+    <img src="img/carousel-1.jpg" alt="Hotel">
+
+    <br>
+    <a href="#booking" class="button">Book a Room</a>
+</section>
+
+<!-- About -->
+<section id="about" class="blue-section">
+    <h2>About Us</h2>
+
+    <p>
+        The Mumbai Diaries is a hotel located in Mumbai,
+        offering comfortable rooms and useful facilities
+        for guests.
+    </p>
+
+    <div class="stats">
+        <div>
+            <h3>25</h3>
+            <p>Total Rooms</p>
+        </div>
+
+        <div>
+            <h3>50</h3>
+            <p>Staff Members</p>
+        </div>
+
+        <div>
+            <h3>500</h3>
+            <p>Clients</p>
+        </div>
+    </div>
+</section>
+
+<!-- Rooms -->
+<section id="rooms">
+    <h2>Our Rooms</h2>
+    <p>Select a room according to your needs.</p>
+
+    <div class="cards">
+
+        <div class="card">
+            <img src="img/room-1.jpg" alt="Single Bed Room">
+            <h3>Single Bed Room</h3>
+            <p>₹1,500 per night</p>
+            <a href="#booking" class="button"
+               onclick="selectRoom('Single Bed Room')">Book Now</a>
+        </div>
+
+        <div class="card">
+            <img src="img/room-2.jpg" alt="Double Bed Room">
+            <h3>Double Bed Room</h3>
+            <p>₹2,500 per night</p>
+            <a href="#booking" class="button"
+               onclick="selectRoom('Double Bed Room')">Book Now</a>
+        </div>
+
+        <div class="card">
+            <img src="img/room-3.jpg" alt="Deluxe Room">
+            <h3>Deluxe Room</h3>
+            <p>₹4,000 per night</p>
+            <a href="#booking" class="button"
+               onclick="selectRoom('Deluxe Room')">Book Now</a>
+        </div>
+
+        <div class="card">
+            <img src="img/room-4.jpg" alt="Suite Room">
+            <h3>Suite Room</h3>
+            <p>₹5,000 per night</p>
+            <a href="#booking" class="button"
+               onclick="selectRoom('Suite Room')">Book Now</a>
+        </div>
+
+    </div>
+</section>
+
+<!-- Services -->
+<section id="services" class="blue-section">
+    <h2>Our Services</h2>
+
+    <div class="cards">
+        <div class="card">
+            <h3>Rooms & Apartments</h3>
+            <p>Comfortable accommodation.</p>
+        </div>
+
+        <div class="card">
+            <h3>Food & Restaurant</h3>
+            <p>Food and dining facilities.</p>
+        </div>
+
+        <div class="card">
+            <h3>Bar & Fitness</h3>
+            <p>Fitness and relaxation facilities.</p>
+        </div>
+
+        <div class="card">
+            <h3>Sports & Gaming</h3>
+            <p>Recreation and indoor games.</p>
+        </div>
+
+        <div class="card">
+            <h3>Event & Party</h3>
+            <p>Space for events and celebrations.</p>
+        </div>
+
+        <div class="card">
+            <h3>Gym & Yoga</h3>
+            <p>Exercise and yoga facilities.</p>
+        </div>
+    </div>
+</section>
+
+<!-- Booking -->
+<section id="booking">
+    <h2>Book Your Room</h2>
+    <p>Enter your details to make a booking request.</p>
+
+    <form id="bookingForm">
+        <input type="text" id="name"
+               placeholder="Your Name" required>
+
+        <input type="email" id="email"
+               placeholder="Your Email" required>
+
+        <br>
+
+        <label for="checkin">Check-in:</label>
+        <input type="date" id="checkin" required>
+
+        <br>
+
+        <label for="checkout">Check-out:</label>
+        <input type="date" id="checkout" required>
+
+        <br>
+
+        <select id="roomType" required>
+            <option value="">Select Room</option>
+            <option>Single Bed Room</option>
+            <option>Double Bed Room</option>
+            <option>Deluxe Room</option>
+            <option>Suite Room</option>
+        </select>
+
+        <select id="guests" required>
+            <option value="">Number of Guests</option>
+            <option value="1">1 Guest</option>
+            <option value="2">2 Guests</option>
+            <option value="3">3 Guests</option>
+            <option value="4">4 Guests</option>
+        </select>
+
+        <br>
+
+        <button type="submit" class="button">
+            Submit Booking
+        </button>
+    </form>
+</section>
+
+<!-- Reviews -->
+<section id="reviews" class="blue-section">
+    <h2>Guest Reviews</h2>
+
+    <div class="cards">
+
+        <div class="card">
+            <img src="img/testimonial-1.jpg" alt="Guest">
+            <h3>Priya Sharma</h3>
+            <p>
+                "The room was clean and comfortable.
+                The staff was helpful. I had a pleasant stay."
+            </p>
+        </div>
+
+        <div class="card">
+            <img src="img/testimonial-2.jpg" alt="Guest">
+            <h3>Rahul Mehta</h3>
+            <p>
+                "Good service and comfortable rooms.
+                I enjoyed my stay and would recommend this hotel."
+            </p>
+        </div>
+
+        <div class="card">
+            <img src="img/testimonial-3.jpg" alt="Guest">
+            <h3>Sneha Iyer</h3>
+            <p>
+                "The hotel was welcoming and peaceful.
+                The facilities made my visit enjoyable."
+            </p>
+        </div>
+
+    </div>
+</section>
+
+<!-- Contact -->
+<section id="contact">
+    <h2>Contact Us</h2>
+
+    <p>Location: Mumbai, Maharashtra, India</p>
+    <p>Phone: 9876543210</p>
+    <p>Email: themumbaidiaries@gmail.com</p>
+
+    <p>Follow Us</p>
+    <p>
+    <a href="https://www.facebook.com/" target="_blank">Facebook</a> |
+    <a href="https://www.instagram.com/" target="_blank">Instagram</a> |
+    <a href="https://www.youtube.com/" target="_blank">YouTube</a>
+    </p>
+</section>
+
+<!-- Footer -->
+<footer>
+    <p>&copy; 2026 The Mumbai Diaries</p>
+    <p>Thank you for visiting our website.</p>
+</footer>
+
+<!-- Simple JavaScript -->
+<script>
+    function selectRoom(room) {
+        document.getElementById("roomType").value = room;
+    }
+
+    document.getElementById("bookingForm").onsubmit = function(event) {
+        event.preventDefault();
+
+        var checkin = document.getElementById("checkin").value;
+        var checkout = document.getElementById("checkout").value;
+
+        if (checkout <= checkin) {
+            alert("Check-out must be after check-in.");
+            return;
+        }
+
+        alert("Booking request submitted successfully!");
+    };
+</script>
+
+</body>
+</html>
