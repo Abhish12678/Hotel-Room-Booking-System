@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Bookings | The Mumbai Diaries</title>
+    <style>
+        body { margin: 0; font-family: Arial, sans-serif; color: #263b55; background: white; }
+        header { background: #245582; color: white; padding: 30px 7%; }
+        header h1 { margin: 0; }
+        section { padding: 24px 7%; }
+        h2 { color: #245582; }
+        .stats { display: flex; flex-wrap: wrap; gap: 18px; }
+        .stat { border: 1px solid #cbdced; background: #f4f9ff; padding: 16px 22px; min-width: 140px; }
+        .stat h3 { margin: 0; color: #245582; font-size: 26px; }
+        .stat p { margin: 4px 0 0; }
+        .controls { margin: 18px 0; }
+        input, select { padding: 9px; margin-right: 10px; border: 1px solid #cbdced; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid #dce6f0; padding: 9px 10px; text-align: left; font-size: 14px; }
+        th { background: #245582; color: white; }
+        tr:nth-child(even) { background: #f4f9ff; }
+        .tag { padding: 2px 8px; border-radius: 10px; font-size: 12px; font-weight: bold; }
+        .occupied { background: #fdecea; color: #c0392b; }
+        .available { background: #e8f8ef; color: #1e7e34; }
+        #message { color: #c0392b; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Bookings Admin</h1>
+    <p>The Mumbai Diaries</p>
+</header>
+
+<section>
+    <div class="stats">
+        <div class="stat"><h3 id="sTotal">0</h3><p>Total Bookings</p></div>
+        <div class="stat"><h3 id="sConfirmed">0</h3><p>Confirmed</p></div>
+        <div class="stat"><h3 id="sCancelled">0</h3><p>Cancelled</p></div>
+        <div class="stat"><h3 id="sRevenue">₹0</h3><p>Total Revenue</p></div>
+    </div>
+
+    <div class="controls">
+        <input id="search" type="text" placeholder="Search guest / email / room">
+        <select id="statusFilter">
+            <option value="">All Statuses</option>
+            <option>Confirmed</option>
+            <option>Checked-In</option>
+            <option>Completed</option>
+            <option>Cancelled</option>
+        </select>
+    </div>
+
+    <p id="message"></p>
+    <table>
+        <thead>
+        <tr>
+            <th>#</th><th>Guest</th><th>Room</th><th>Room Status</th>
+            <th>Check-in</th><th>Check-out</th><th>Nights</th>
+            <th>Guests</th><th>Total</th><th>Status</th>
+        </tr>
+        </thead>
+        <tbody id="rows"></tbody>
+    </table>
+</section>
+
+<script>
+    const STATUSES = ["Confirmed", "Checked-In", "Completed", "Cancelled"];
+    let bookings = [];
+    let occupiedRooms = new Set();
+    const today = new Date().toISOString().split("T")[0];
+
+    const money = n => "₹" + Number(n).toLocaleString("en-IN");
+    const nights = (a, b) => Math.round((new Date(b) - new Date(a)) / 86400000);
+
+    function activeRoomStatus() {
+        occupiedRooms = new Set(
+            bookings
+                .filter(b => ["Confirmed", "Checked-In"].includes(b.bookingStatus))
+                .filter(b => b.checkIn <= today && today < b.checkOut)
+                .map(b => b.roomNumber)
+        );
+    }
+
+    function render() {
+        const term = document.getElementById("search").value.toLowerCase();
+        const status = document.getElementById("statusFilter").value;
+
+        const visible = bookings.filter(b =>
+            (status === "" || b.bookingStatus === status) &&
+            (b.guestName + b.email + b.roomNumber + b.roomType).toLowerCase().includes(term));
+
+        document.getElementById("rows").innerHTML = visible.map(b => {
+            const occupied = occupiedRooms.has(b.roomNumber);
+            const options = STATUSES.map(s =>
+                `<option ${s === b.bookingStatus ? "selected" : ""}>${s}</option>`).join("");
+            return `<tr>
+                <td>${b.bookingId}</td>
+                <td>${b.guestName}<br><small>${b.email}</small></td>
+                <td>${b.roomType}<br><small>Room ${b.roomNumber}</small></td>
+                <td><span class="tag ${occupied ? "occupied" : "available"}">${occupied ? "Occupied" : "Available"}</span></td>
+                <td>${b.checkIn}</td>
+                <td>${b.checkOut}</td>
+                <td>${nights(b.checkIn, b.checkOut)}</td>
+                <td>${b.numberOfGuests}</td>
+                <td>${money(b.totalAmount)}</td>
+                <td><select onchange="setStatus(${b.bookingId}, this.value)">${options}</select></td>
+            </tr>`;
+        }).join("");
+
+        updateStats();
+    }
+
+    function updateStats() {
+        document.getElementById("sTotal").textContent = bookings.length;
+        document.getElementById("sConfirmed").textContent =
+            bookings.filter(b => b.bookingStatus === "Confirmed").length;
+        document.getElementById("sCancelled").textContent =
+            bookings.filter(b => b.bookingStatus === "Cancelled").length;
+        document.getElementById("sRevenue").textContent =
+            money(bookings.filter(b => b.bookingStatus !== "Cancelled")
+                .reduce((sum, b) => sum + Number(b.totalAmount), 0));
+    }
+
+    async function load() {
+        const res = await fetch("/api/bookings");
+        if (!res.ok) {
+            document.getElementById("message").textContent = "Failed to load bookings (HTTP " + res.status + ").";
+            return;
+        }
+        bookings = await res.json();
+        activeRoomStatus();
+        render();
+    }
+
+    async function setStatus(id, status) {
+        const res = await fetch(`/api/bookings/${id}/status?status=${encodeURIComponent(status)}`, { method: "PATCH" });
+        if (!res.ok) {
+            const body = await res.json().catch(() => ({}));
+            document.getElementById("message").textContent = body.message || "Update failed.";
+            return;
+        }
+        document.getElementById("message").textContent = "";
+        const updated = await res.json();
+        bookings = bookings.map(b => b.bookingId === id ? updated : b);
+        activeRoomStatus();
+        render();
+    }
+
+    document.getElementById("search").oninput = render;
+    document.getElementById("statusFilter").onchange = render;
+    load();
+</script>
+
+</body>
+</html>

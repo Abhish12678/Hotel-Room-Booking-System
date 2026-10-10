@@ -289,11 +289,7 @@
         <br>
 
         <select id="roomType" required>
-            <option value="">Select Room</option>
-            <option>Single Bed Room</option>
-            <option>Double Bed Room</option>
-            <option>Deluxe Room</option>
-            <option>Suite Room</option>
+            <option value="">Loading rooms...</option>
         </select>
 
         <select id="guests" required>
@@ -306,9 +302,11 @@
 
         <br>
 
-        <button type="submit" class="button">
+        <button type="submit" class="button" id="submitBtn">
             Submit Booking
         </button>
+
+        <p id="bookingMessage" style="margin-top:14px; font-weight:bold;"></p>
     </form>
 </section>
 
@@ -368,27 +366,114 @@
 <footer>
     <p>&copy; 2026 The Mumbai Diaries</p>
     <p>Thank you for visiting our website.</p>
+    <p><a href="/admin.html">Admin</a></p>
 </footer>
 
-<!-- Simple JavaScript -->
+<!-- Booking JavaScript -->
 <script>
     function selectRoom(room) {
         document.getElementById("roomType").value = room;
     }
 
-    document.getElementById("bookingForm").onsubmit = function(event) {
+    function loadRooms() {
+        fetch("/api/rooms")
+            .then(function (res) { return res.json(); })
+            .then(function (rooms) {
+                var select = document.getElementById("roomType");
+                select.innerHTML = '<option value="">Select Room</option>';
+
+                var seen = {};
+                rooms.forEach(function (room) {
+                    if (seen[room.roomType]) {
+                        return;
+                    }
+                    seen[room.roomType] = true;
+
+                    var option = document.createElement("option");
+                    option.value = room.roomType;
+                    option.textContent = room.roomType + " - \u20B9" +
+                        Number(room.pricePerNight).toLocaleString("en-IN") + " / night";
+                    select.appendChild(option);
+                });
+            })
+            .catch(function () {
+                document.getElementById("roomType").innerHTML =
+                    '<option value="">Could not load rooms</option>';
+            });
+    }
+
+    function setMinDates() {
+        var today = new Date().toISOString().split("T")[0];
+        document.getElementById("checkin").min = today;
+        document.getElementById("checkout").min = today;
+    }
+
+    function showMessage(text, ok) {
+        var el = document.getElementById("bookingMessage");
+        el.textContent = text;
+        el.style.color = ok ? "#1e7e34" : "#c0392b";
+    }
+
+    document.getElementById("bookingForm").onsubmit = function (event) {
         event.preventDefault();
 
         var checkin = document.getElementById("checkin").value;
         var checkout = document.getElementById("checkout").value;
 
         if (checkout <= checkin) {
-            alert("Check-out must be after check-in.");
+            showMessage("Check-out must be after check-in.", false);
             return;
         }
 
-        alert("Booking request submitted successfully!");
+        var payload = {
+            name: document.getElementById("name").value.trim(),
+            email: document.getElementById("email").value.trim(),
+            phone: "",
+            checkIn: checkin,
+            checkOut: checkout,
+            roomType: document.getElementById("roomType").value,
+            numberOfGuests: parseInt(document.getElementById("guests").value, 10)
+        };
+
+        var btn = document.getElementById("submitBtn");
+        btn.disabled = true;
+        showMessage("Submitting...", true);
+
+        fetch("/api/bookings", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        })
+            .then(function (res) {
+                return res.json().then(function (body) {
+                    return { ok: res.ok, body: body };
+                });
+            })
+            .then(function (result) {
+                if (result.ok) {
+                    var b = result.body;
+                    showMessage(
+                        "Booking confirmed! #" + b.bookingId +
+                        " - " + b.roomType + " (Room " + b.roomNumber + "), " +
+                        b.numberOfGuests + " guest(s), total \u20B9" +
+                        Number(b.totalAmount).toLocaleString("en-IN") + ".",
+                        true
+                    );
+                    document.getElementById("bookingForm").reset();
+                } else {
+                    showMessage(result.body.message || "Booking failed.", false);
+                }
+            })
+            .catch(function () {
+                showMessage("Network error. Please try again.", false);
+            })
+            .finally(function () {
+                btn.disabled = false;
+            });
     };
+
+    loadRooms();
+    setMinDates();
 </script>
 
 </body>
